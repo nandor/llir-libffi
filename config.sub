@@ -929,7 +929,7 @@ EOF
 	# We use `pc' rather than `unknown'
 	# because (1) that's what they normally are, and
 	# (2) the word "unknown" tends to confuse beginning users.
-	i*86 | x86_64)
+	i*86 | x86_64 | llir_i*86 | llir_x86_64)
 		cpu=$basic_machine
 		vendor=pc
 		;;
@@ -939,7 +939,7 @@ EOF
 		cpu=i386
 		vendor=pc
 		;;
-	x64 | amd64)
+	x64 | amd64 | llir_x64 | llir_amd64)
 		cpu=x86_64
 		vendor=pc
 		;;
@@ -1010,7 +1010,7 @@ case $cpu-$vendor in
 		;;
 
 	# Here we normalize CPU types irrespective of the vendor
-	amd64-*)
+	amd64-* | llir_amd64-*)
 		cpu=x86_64
 		;;
 	blackfin-*)
@@ -1098,7 +1098,7 @@ case $cpu-$vendor in
 	tx39el-*)
 		cpu=mipstx39el
 		;;
-	x64-*)
+	x64-* | llir_x64-*)
 		cpu=x86_64
 		;;
 	xscale-* | xscalee[bl]-*)
@@ -1250,7 +1250,8 @@ case $cpu-$vendor in
 			| w65 \
 			| wasm32 | wasm64 \
 			| we32k \
-			| x86 | x86_64 | xc16x | xgate | xps100 \
+			| x86 | x86_64 | llir_x86 | llir_x86_64 \
+                        | xc16x | xgate | xps100 \
 			| xstormy16 | xtensa* \
 			| ymp \
 			| z8k | z80)

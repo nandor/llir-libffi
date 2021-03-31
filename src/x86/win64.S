@@ -1,3 +1,22 @@
+#ifdef __llir__
+
+ffi_call_win64:
+  .visibility global_hidden
+  trap
+  .end
+
+ffi_closure_win64:
+  .visibility global_hidden
+  trap
+  .end
+
+ffi_go_closure_win64:
+  .visibility global_hidden
+  trap
+  .end
+
+#else
+
 #ifdef __x86_64__
 #define LIBFFI_ASM
 #include <fficonfig.h>
@@ -238,3 +257,5 @@ C(ffi_closure_win64):
 #if defined __ELF__ && defined __linux__
 	.section	.note.GNU-stack,"",@progbits
 #endif
+
+#endif /* __llir__ */
