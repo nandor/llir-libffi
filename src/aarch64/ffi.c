@@ -80,7 +80,8 @@ ffi_clear_cache (void *start, void *end)
 #if defined (__clang__) && defined (__APPLE__)
   sys_icache_invalidate (start, (char *)end - (char *)start);
 #elif defined (__GNUC__)
-  __builtin___clear_cache (start, end);
+  abort();
+  //__builtin___clear_cache (start, end);
 #elif defined (_WIN32)
   FlushInstructionCache(GetCurrentProcess(), start, (char*)end - (char*)start);
 #else

@@ -433,7 +433,9 @@ ffi_status ffi_prep_closure_loc(ffi_closure *closure, ffi_cif *cif, void (*fun)(
     closure->fun = fun;
     closure->user_data = user_data;
 
-    __builtin___clear_cache(codeloc, codeloc + FFI_TRAMPOLINE_SIZE);
+    abort();
+
+    // __builtin___clear_cache(codeloc, codeloc + FFI_TRAMPOLINE_SIZE);
 
     return FFI_OK;
 }
