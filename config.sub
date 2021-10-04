@@ -864,7 +864,7 @@ case $basic_machine in
 		cpu=pn
 		vendor=gould
 		;;
-	power)
+	power|llir_power)
 		cpu=power
 		vendor=ibm
 		;;
@@ -1159,6 +1159,7 @@ case $cpu-$vendor in
 			1750a | 580 \
 			| a29k \
 			| aarch64 | aarch64_be \
+			| llir_aarch64 | llir_aarch64_be \
 			| abacus \
 			| alpha | alphaev[4-8] | alphaev56 | alphaev6[78] \
 			| alpha64 | alpha64ev[4-8] | alpha64ev56 | alpha64ev6[78] \
@@ -1227,9 +1228,12 @@ case $cpu-$vendor in
 			| picochip \
 			| pdp10 | pdp11 | pj | pjl | pn | power \
 			| powerpc | powerpc64 | powerpc64le | powerpcle | powerpcspe \
+			| llir_power | llir_powerpc | llir_powerpc64 | llir_powerpc64le \
+			| llir_powerpcle | llir_powerpcspe \
 			| pru \
 			| pyramid \
 			| riscv | riscv32 | riscv64 \
+			| llir_riscv | llir_riscv32 | llir_riscv64 \
 			| rl78 | romp | rs6000 | rx \
 			| s390 | s390x \
 			| score \

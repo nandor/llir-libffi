@@ -333,6 +333,9 @@ extend_hfa_type (void *dest, void *src, int h)
   ssize_t f = h - AARCH64_RET_S4;
   void *x0;
 
+#if defined(__llir__)
+  abort();
+#else
   asm volatile (
 	"adr	%0, 0f\n"
 "	add	%0, %0, %1\n"
@@ -379,6 +382,7 @@ extend_hfa_type (void *dest, void *src, int h)
     : "=&r"(x0)
     : "r"(f * 12), "r"(dest), "r"(src)
     : "memory", "v16", "v17", "v18", "v19");
+#endif
 }
 #endif
 
@@ -388,6 +392,9 @@ void* compress_hfa_type (void *dest, void *src, int h);
 static void *
 compress_hfa_type (void *dest, void *reg, int h)
 {
+#if defined(__llir__)
+  abort();
+#else
   switch (h)
     {
     case AARCH64_RET_S1:
@@ -452,6 +459,7 @@ compress_hfa_type (void *dest, void *reg, int h)
       break;
     }
   return dest;
+#endif
 }
 #endif
 

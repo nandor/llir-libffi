@@ -66,6 +66,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 # define BLR(r) blr r
 #endif
 
+#ifdef __llir__
+
+	.globl CNAME(ffi_call_SYSV)
+CNAME(ffi_call_SYSV):
+	trap
+	.end
+#else
 	.text
 	.align 4
 
@@ -212,6 +219,7 @@ CNAME(ffi_call_SYSV):
 	.type	CNAME(ffi_call_SYSV), #function
 	.size CNAME(ffi_call_SYSV), .-CNAME(ffi_call_SYSV)
 #endif
+#endif
 
 /* ffi_closure_SYSV
 
@@ -228,6 +236,20 @@ CNAME(ffi_call_SYSV):
 */
 
 #define ffi_closure_SYSV_FS (8*2 + CALL_CONTEXT_SIZE + 64)
+
+#ifdef __llir__
+
+	.globl CNAME(ffi_closure_SYSV)
+CNAME(ffi_closure_SYSV):
+	trap
+	.end
+
+	.globl CNAME(ffi_closure_SYSV_V)
+CNAME(ffi_closure_SYSV_V):
+	trap
+	.end
+
+#else
 
 	.align 4
 CNAME(ffi_closure_SYSV_V):
@@ -367,10 +389,20 @@ CNAME(ffi_closure_SYSV):
 	.size	CNAME(ffi_closure_SYSV), . - CNAME(ffi_closure_SYSV)
 #endif
 
+#endif
+
 #if FFI_EXEC_TRAMPOLINE_TABLE
 
 #ifdef __MACH__
 #include <mach/machine/vm_param.h>
+#ifdef __llir__
+
+	.globl CNAME(ffi_closure_trampoline_table_page)
+CNAME(ffi_closure_trampoline_table_page):
+	trap
+	.end
+
+#else
     .align PAGE_MAX_SHIFT
 CNAME(ffi_closure_trampoline_table_page):
     .rept PAGE_MAX_SIZE / FFI_TRAMPOLINE_SIZE
@@ -386,11 +418,25 @@ CNAME(ffi_closure_trampoline_table_page):
     	.type	CNAME(ffi_closure_trampoline_table_page), #function
     	.size	CNAME(ffi_closure_trampoline_table_page), . - CNAME(ffi_closure_trampoline_table_page)
     #endif
+#endif /* __llir__ */
 #endif
 
 #endif /* FFI_EXEC_TRAMPOLINE_TABLE */
 
 #ifdef FFI_GO_CLOSURES
+#ifdef __llir__
+
+	.globl CNAME(ffi_go_closure_SYSV)
+CNAME(ffi_go_closure_SYSV):
+	trap
+	.end
+
+	.globl CNAME(ffi_go_closure_SYSV_V)
+CNAME(ffi_go_closure_SYSV_V):
+	trap
+	.end
+#else
+
 	.align 4
 CNAME(ffi_go_closure_SYSV_V):
 	cfi_startproc
@@ -442,10 +488,11 @@ CNAME(ffi_go_closure_SYSV):
 	.type	CNAME(ffi_go_closure_SYSV), #function
 	.size	CNAME(ffi_go_closure_SYSV), . - CNAME(ffi_go_closure_SYSV)
 #endif
+#endif /* __llir__ */
 #endif /* FFI_GO_CLOSURES */
 #endif /* __arm64__ */
 
-#if defined __ELF__ && defined __linux__
+#if defined __ELF__ && defined __linux__ && !defined(__llir__)
 	.section .note.GNU-stack,"",%progbits
 #endif
 

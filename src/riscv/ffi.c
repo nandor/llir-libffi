@@ -150,12 +150,20 @@ static void marshal_atom(call_builder *cb, int type, void *data) {
            reinterpret floats as doubles */
 #if ABI_FLEN >= 32
         case FFI_TYPE_FLOAT:
-            asm("" : "=f"(cb->aregs->fa[cb->used_float++]) : "0"(*(float *)data));
+            #ifdef __llir__
+                abort();
+            #else
+                asm("" : "=f"(cb->aregs->fa[cb->used_float++]) : "0"(*(float *)data));
+            #endif
             return;
 #endif
 #if ABI_FLEN >= 64
         case FFI_TYPE_DOUBLE:
-            asm("" : "=f"(cb->aregs->fa[cb->used_float++]) : "0"(*(double *)data));
+            #ifdef __llir__
+                abort();
+            #else
+                asm("" : "=f"(cb->aregs->fa[cb->used_float++]) : "0"(*(double *)data));
+            #endif
             return;
 #endif
         default: FFI_ASSERT(0); break;
@@ -173,12 +181,20 @@ static void unmarshal_atom(call_builder *cb, int type, void *data) {
     switch (type) {
 #if ABI_FLEN >= 32
         case FFI_TYPE_FLOAT:
-            asm("" : "=f"(*(float *)data) : "0"(cb->aregs->fa[cb->used_float++]));
+            #ifdef __llir__
+                abort();
+            #else
+                asm("" : "=f"(*(float *)data) : "0"(cb->aregs->fa[cb->used_float++]));
+            #endif
             return;
 #endif
 #if ABI_FLEN >= 64
         case FFI_TYPE_DOUBLE:
-            asm("" : "=f"(*(double *)data) : "0"(cb->aregs->fa[cb->used_float++]));
+            #ifdef __llir__
+                abort();
+            #else
+                asm("" : "=f"(*(double *)data) : "0"(cb->aregs->fa[cb->used_float++]));
+            #endif
             return;
 #endif
     }

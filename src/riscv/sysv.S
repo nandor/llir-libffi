@@ -56,6 +56,13 @@
 
 #define fp s0
 
+#ifdef __llir__
+    .globl  ffi_call_asm
+    .hidden ffi_call_asm
+ffi_call_asm:
+    trap
+    .end
+#else
     .text
     .globl  ffi_call_asm
     .type   ffi_call_asm, @function
@@ -142,7 +149,7 @@ ffi_call_asm:
     ret
     .cfi_endproc
     .size   ffi_call_asm, .-ffi_call_asm
-
+#endif
 
 /*
   ffi_closure_asm. Expects address of the passed-in ffi_closure in t1.
@@ -152,6 +159,13 @@ ffi_call_asm:
 		          size_t *stackargs, struct call_context *regargs)
 */
 
+#ifdef __llir__
+    .globl ffi_closure_asm
+    .hidden ffi_closure_asm
+ffi_closure_asm:
+    trap
+    .end
+#else
     .globl ffi_closure_asm
     .hidden ffi_closure_asm
     .type ffi_closure_asm, @function
@@ -217,6 +231,7 @@ ffi_closure_asm:
     ret
     .cfi_endproc
     .size ffi_closure_asm, .-ffi_closure_asm
+#endif
 
 /*
   ffi_go_closure_asm.  Expects address of the passed-in ffi_go_closure in t2.
@@ -225,7 +240,13 @@ ffi_closure_asm:
 		          void *user_data,
 		          size_t *stackargs, struct call_context *regargs)
 */
-
+#ifdef __llir__
+    .globl ffi_go_closure_asm
+    .hidden ffi_go_closure_asm
+ffi_go_closure_asm:
+    trap
+    .end
+#else
     .globl ffi_go_closure_asm
     .hidden ffi_go_closure_asm
     .type ffi_go_closure_asm, @function
@@ -291,3 +312,4 @@ ffi_go_closure_asm:
     ret
     .cfi_endproc
     .size ffi_go_closure_asm, .-ffi_go_closure_asm
+#endif
