@@ -26,12 +26,148 @@
    DEALINGS IN THE SOFTWARE.
    ----------------------------------------------------------------------- */
 
+#include "internal64.h"
+
 #ifdef __llir__
 
+/*
+	ffi_call_unix64(
+			void *args,
+			unsigned long bytes,
+			unsigned flags,
+      void *raddr,
+      void (*fnaddr)(void)
+  );
+*/
 ffi_call_unix64:
   .visibility global_hidden
+  .args 			i64, i64, i32, i64, i64
+
+  arg.i64 						$0, 0 # args
+  arg.i64 						$1, 1 # bytes
+  arg.i32 						$2, 2 # flags
+  arg.i64 						$3, 3 # raddr
+  arg.i64 						$4, 4 # fnaddr
+
+  # Save flags
+  add.i64 						$6, $0, $1
+  store  							$6, $2
+
+  # Save raddr
+  mov.i64 						$20, 8
+  add.i64 						$21, $6, $20
+  store  							$21, $3
+
+  # Save old frame pointer
+  mov.i64 						$30, 16
+  add.i64 						$31, $6, $30
+  get.i64 						$32, $frame_addr
+  store  							$31, $32
+
+  # Load up all argument registers.
+  load.i64						$100, $0 						# rdi
+  mov.i64 						$200, 8
+  add.i64 						$201, $200, $0
+  load.i64						$101, $201 					# rsi
+  mov.i64 						$200, 16
+  add.i64 						$201, $200, $0
+  load.i64						$102, $201 					# rdx
+  mov.i64 						$200, 24
+  add.i64 						$201, $200, $0
+  load.i64						$103, $201 					# rcx
+  mov.i64 						$200, 32
+  add.i64 						$201, $200, $0
+  load.i64						$104, $201 					# r8
+  mov.i64 						$200, 40
+  add.i64 						$201, $200, $0
+  load.i64						$105, $201 					# r9
+  mov.i64 						$200, 176
+  add.i64 						$201, $200, $0
+  load.i32						$106, $201 					# eax
+
+  mov.i32 						$210, 0
+  cmp.eq.i32  				$211, $106, $210
+  jt  								$211, .Lno_load_sse
+
+  # TODO: load SSE registers
   trap
-  .end
+
+ .Lno_load_sse:
+ 	# Find the address of the callee frame.
+  mov.i64 						$300, 192
+  add.i64 						$999, $0, $300
+
+  # Dispatch based on return type.
+	trunc.i8    				$300, $2
+	mov.i8 							$301, UNIX64_RET_LAST
+	cmp.ugt.i8  				$302, $300, $301
+	jt 									$302, .Linvalid
+	z_ext.i64 					$303, $300
+	switch  						$303, .LRET_VOID, .LRET_UINT8, .LRET_UINT16, .LRET_UINT32, .LRET_SINT8, .LRET_SINT16, .LRET_SINT32, .LRET_INT64, .LRET_XMM32, .LRET_XMM64, .LRET_X87, .LRET_X87_2, .LRET_ST_XMM0_RAX, .LRET_ST_RAX_XMM0, .LRET_ST_XMM0_XMM1, .LRET_ST_RAX_RDX
+
+.LRET_VOID:
+	frame_call.c 				$999, $4, $100, $101, $102, $103, $104, $105
+	ret
+
+.LRET_UINT8:
+	frame_call.c.i8 	  $500, $999, $4, $100, $101, $102, $103, $104, $105
+	z_ext.i64 					$501, $500
+	store 							$3, $501
+	ret
+.LRET_UINT16:
+	frame_call.c.i16 	  $500, $999, $4, $100, $101, $102, $103, $104, $105
+	z_ext.i64 					$501, $500
+	store 							$3, $501
+	ret
+.LRET_UINT32:
+	frame_call.c.i32 	  $500, $999, $4, $100, $101, $102, $103, $104, $105
+	z_ext.i64 					$501, $500
+	store 							$3, $501
+	ret
+
+.LRET_SINT8:
+	frame_call.c.i8 	  $500, $999, $4, $100, $101, $102, $103, $104, $105
+	s_ext.i64 					$501, $500
+	store 							$3, $501
+	ret
+.LRET_SINT16:
+	frame_call.c.i16 	  $500, $999, $4, $100, $101, $102, $103, $104, $105
+	s_ext.i64 					$501, $500
+	store 							$3, $501
+	ret
+.LRET_SINT32:
+	frame_call.c.i32 	  $500, $999, $4, $100, $101, $102, $103, $104, $105
+	s_ext.i64 					$501, $500
+	store 							$3, $501
+	ret
+
+.LRET_INT64:
+	frame_call.c.i64 	  $500, $999, $4, $100, $101, $102, $103, $104, $105
+	store 							$3, $500
+	ret
+
+.LRET_XMM32:
+	trap
+.LRET_XMM64:
+	trap
+.LRET_X87:
+	trap
+.LRET_X87_2:
+	trap
+.LRET_ST_XMM0_RAX:
+	trap
+.LRET_ST_RAX_XMM0:
+	trap
+.LRET_ST_XMM0_XMM1:
+	trap
+.LRET_ST_RAX_RDX:
+	trap
+
+.Linvalid:
+	mov.i64 		$0, abort
+	call.c 			$0
+	trap
+	.end
 
 ffi_closure_unix64:
   .visibility global_hidden
@@ -58,7 +194,6 @@ ffi_go_closure_unix64_sse:
 #define LIBFFI_ASM	
 #include <fficonfig.h>
 #include <ffi.h>
-#include "internal64.h"
 #include "asmnames.h"
 
 	.text
